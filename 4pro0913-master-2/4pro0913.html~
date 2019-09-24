@@ -1,0 +1,18 @@
+<html>
+  <head>
+    <title>Shrink Rotate</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  </head>
+
+  <body>
+    <div id="app">
+      
+      <svg width=800 height=800>
+	
+	<circle v-for="a in choutenn" :cx="a.x" :cy="a.y" r=5></circle>
+	<polygon v-for="a in men" :points="points(a)" stroke="black" fill="red" opacity=0.5></polygon>
+	</svg>
+    </div>
+    <script src="shrinkrotate.js"></script>
+  </body>
+</html>

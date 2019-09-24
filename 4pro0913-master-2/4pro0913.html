@@ -1,0 +1,22 @@
+<html>
+  <head>
+    <title>Shrink Rotate</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  </head>
+
+  <body>
+    <div id="app">
+      
+      <svg width=800 height=800>
+	
+	<polygon v-for="a in men" :points="points(a)" stroke="black" fill="white" fill-opacity=0.5></polygon>
+	<polygon v-for="a in shrunken" :points="a" stroke="black" fill="red" fill-opacity=0.5></polygon>
+      </svg>
+      <div>
+	<input type="range" v-model="cont" min=50 max=120>
+	<input type="range" v-model="theta" min="-90" max="90">
+      </div>
+    </div>
+    <script src="shrinkrotate.js"></script>
+  </body>
+</html>
