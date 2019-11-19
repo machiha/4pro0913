@@ -26,7 +26,9 @@ let app = new Vue({
 	*/
 	cont:100,
 	theta:0,
+
 	folded: false,
+
 	
 	choutenn: {"-2,-2,0":{"x":-200,"y":400},
 		   "-2,-2,1":{"x":-100,"y":400},
@@ -94,10 +96,12 @@ let app = new Vue({
 	      "2,-1":["-1,2,0","-1,2,1","0,2,0","0,1,1","0,1,0","-1,1,1"],
 	      "2,0":["0,2,0","0,2,1","1,2,0","1,1,1","1,1,0","0,1,1"],
 	      "2,1":["1,2,0","1,2,1","2,2,0","2,1,1","2,1,0","1,1,1"]},
+
     },
     
     computed:{
 	shrunken:function(){
+
 	    let pqab=function(m,n){
 		let pairs = {pq:[],ab:[]};
 		for (let p of points[m]){
@@ -120,6 +124,7 @@ let app = new Vue({
 	    let profile={};
 	    let shifts={};
 	    let vertices = this.choutenn;
+
 	    for(let f in this.men){
 		let xsum=0;
 		let ysum=0;
@@ -129,8 +134,10 @@ let app = new Vue({
 		    ysum += this.choutenn[v].y;
 		    l++;
 		}
-		let mcx=xsum/l; // 重心のx座標
-		let mcy=ysum/l; // 重心のy座標
+
+		let mcx=xsum/l;
+		let mcy=ysum/l;
+
 		let pstr=" ";
 		let idx=0;
 		let face = [];
@@ -146,6 +153,7 @@ let app = new Vue({
 		    profile[f+idx] = {v:v, f:f};
 		    face.push(f+idx);
 		    idx++;
+
 		}
 		points[f+"shrink"]=face;
 	    }
@@ -159,6 +167,7 @@ let app = new Vue({
 		    
 		}
 	    }
+
 
 	    let makeTree=function(to, from, delta){
 		console.log(to + " " + from + " " + delta.x + delta.y);
@@ -207,6 +216,7 @@ let app = new Vue({
 		}
 	    }
 	    return {men:points, hen:edges, profile:profile};
+
 	}
     },
 
@@ -214,7 +224,6 @@ let app = new Vue({
 
     methods:{
 
-	
 	adjacent:function(f,g){//tell if f and g are adjacent
 	    let count=0;
 	    for(let v of f){
