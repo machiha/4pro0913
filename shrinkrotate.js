@@ -26,6 +26,9 @@ let app = new Vue({
 	*/
 	cont:100,
 	theta:0,
+
+	folded: false,
+
 	
 	choutenn: {"-2,-2,0":{"x":-200,"y":400},
 		   "-2,-2,1":{"x":-100,"y":400},
@@ -98,8 +101,30 @@ let app = new Vue({
     
     computed:{
 	shrunken:function(){
+
+	    let pqab=function(m,n){
+		let pairs = {pq:[],ab:[]};
+		for (let p of points[m]){
+		    for (let a of points[n]){
+			if (profile[p].v == profile[a].v){
+			    pairs.pq.push(p);
+			    pairs.ab.push(a);
+			}
+		    }
+		}
+		if (pairs.pq.length==2){
+		    return pairs;
+		}
+		else{
+		    return null;
+		}
+	    };
+	    
 	    let points={};
 	    let profile={};
+	    let shifts={};
+	    let vertices = this.choutenn;
+
 	    for(let f in this.men){
 		let xsum=0;
 		let ysum=0;
@@ -109,8 +134,10 @@ let app = new Vue({
 		    ysum += this.choutenn[v].y;
 		    l++;
 		}
+
 		let mcx=xsum/l;
 		let mcy=ysum/l;
+
 		let pstr=" ";
 		let idx=0;
 		let face = [];
@@ -126,7 +153,7 @@ let app = new Vue({
 		    profile[f+idx] = {v:v, f:f};
 		    face.push(f+idx);
 		    idx++;
-		    
+
 		}
 		points[f+"shrink"]=face;
 	    }
@@ -140,13 +167,63 @@ let app = new Vue({
 		    
 		}
 	    }
-	    return {men:points, hen:edges};
+
+
+	    let makeTree=function(to, from, delta){
+		console.log(to + " " + from + " " + delta.x + delta.y);
+		if (shifts[to]!=null){
+		    return;
+		}
+		else{
+		    if (from == null){
+			shifts[to] = {x:0,y:0};
+		    }
+		    else{
+			shifts[to] = {x: shifts[from].x+delta.x, y: shifts[from].y+delta.y};
+		    }
+		}
+		for (let m in points){
+		    let pts = pqab(m,to);
+		    if (pts!=null){
+			let delta = aDelta(vertices[pts.pq[0]],
+					   vertices[pts.pq[1]],
+					   vertices[pts.ab[0]]
+					  );
+			makeTree(m,to,delta);
+		    }
+		}
+	    };
+	    
+	    let aDelta = function(p,q,a){
+		let d = {x:0,y:0};
+		let inpr = (p.x-q.x)*(a.x-p.x) + (p.y-q.y)*(a.y-p.y);
+		let dpq = (p.x-q.x)*(p.x-q.x) + (p.y-q.y)*(p.y-q.y);
+		d.x = 2*(p.x-a.x) + 2*inpr/dpq*(p.x - q.x);
+		d.y = 2*(p.y-a.y) + 2*inpr/dpq*(p.y - q.y);
+		return d;
+	    };
+		
+	    if (this.folded){ // 折りたたみ後の座標計算
+		shifts={};
+		makeTree("0,0shrink",null,0);
+		console.log(shifts);
+		for (let m in shifts){
+		    for (let v of points[m]){
+			console.log([v,shifts[v]]);
+			this.choutenn[v].x -= shifts[m].x;
+			this.choutenn[v].y -= shifts[m].y;
+		    }
+		}
+	    }
+	    return {men:points, hen:edges, profile:profile};
+
 	}
     },
 
     
 
     methods:{
+
 	adjacent:function(f,g){//tell if f and g are adjacent
 	    let count=0;
 	    for(let v of f){
@@ -174,7 +251,56 @@ let app = new Vue({
 		s += " "+this.choutenn[p].x+" "+this.choutenn[p].y;
 	    }
 	    return s;
+	},
+
+	pqab: function(m,n){
+	    let pairs = {pq:[],ab:[]};
+	    for (let p of this.shrunken.men[m]){
+		for (let a of this.shrunken.men[n]){
+		    if (this.shrunken.profile[p].v == this.shrunken.profile[a].v){
+			pairs.pq.push(p);
+			pairs.ab.push(a);
+		    }
+		}
+	    }
+	    if (pairs.pq.length==2){
+		return pairs;
+	    }
+	    else{
+		return null;
+	    }
+	},
+
+	aDelta(p,q,a){
+	    let d = {x:0,y:0};
+	    let inpr = (p.x-q.x)*(a.x-p.x) + (p.y-q.y)*(a.y-p.y);
+	    let dpq = (p.x-q.x)*(p.x-q.x) + (p.y-q.y)*(p.y-q.y);
+	    d.x = 2*(p.x-a.x) + 2*inpr/dpq*(p.x - q.x);
+	    d.y = 2*(p.y-a.y) + 2*inpr/dpq*(p.y - q.y);
+	    return d;
+	},
+	
+	fold: function(){
+	    this.folded=true;
+	    //for (let m in this.shrunken.men){
+	    //	if (this.pqab(m,"0,0shrink")!=null){
+	    //	    let pts = this.pqab(m,"0,0shrink");
+	    //	    let delta = this.aDelta(this.choutenn[pts.pq[0]],
+	    //				this.choutenn[pts.pq[1]],
+	    //				this.choutenn[pts.ab[0]]
+	    //			       );
+	    //	    for (let v of this.shrunken.men[m]){
+	    //		this.choutenn[v].x -= delta.x;
+	    //		this.choutenn[v].y -= delta.y;
+	    //	    }
+	    //	}
+	    //}
+	},
+
+	unfold: function(){
+	    this.folded=false;
 	}
+
     }
     
     

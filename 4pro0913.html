@@ -6,6 +6,12 @@
 
   <body>
     <div id="app">
+
+      <button v-if="!folded" @click="fold"> 折る </button>
+      <button v-if="folded" @click="unfold"> 展開 </button>
+
+      <div >
+	
       
       <svg width=1000 height=800>
 	
@@ -17,6 +23,7 @@
       <div>
 	<input type="range" v-model="cont" min=50 max=120>
 	<input type="range" v-model="theta" min="-90" max="90">
+
       </div>
     </div>
     <script src="shrinkrotate.js"></script>
